@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icon/operator/default.ico</file>
+    </qresource>
+</RCC>
