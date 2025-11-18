@@ -44,6 +44,8 @@ public:
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
+    void startDrag(Qt::DropActions supportedActions) override;
+
 private:
     void updateLayout();
     QList<QTableWidgetItem *> _items;
@@ -63,6 +65,7 @@ protected:
 
     QSize sizeHint(const QStyleOptionViewItem &option,
                    const QModelIndex &index) const override;
+
 };
 
 #endif // OPERATORSELECTOR_H

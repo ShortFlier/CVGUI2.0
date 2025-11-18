@@ -86,6 +86,13 @@ void OperatorTable::resizeEvent(QResizeEvent *event)
     }
 }
 
+void OperatorTable::startDrag(Qt::DropActions supportedActions)
+{
+    QTableWidgetItem *citem=currentItem();
+    if(citem)
+        QTableWidget::startDrag(supportedActions);
+}
+
 void OperatorTable::updateLayout()
 {
     int cols = qMax(1, width() / FIXED_SIZE.width());
@@ -132,7 +139,9 @@ void IconTextDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     painter->save();
 
     // 绘制背景
-    if (option.state & QStyle::State_Selected) {
+    QTableWidget* tableWidget=qobject_cast<QTableWidget*>(parent());
+    //被选中的cell有内容时高亮
+    if ((option.state & QStyle::State_Selected) && tableWidget->itemFromIndex(index)) {
         painter->fillRect(option.rect, option.palette.highlight());
     } else {
         painter->fillRect(option.rect, option.palette.base());
@@ -179,3 +188,4 @@ QSize IconTextDelegate::sizeHint(const QStyleOptionViewItem &option,
     // 设置较大的单元格尺寸以容纳图标和文字
     return FIXED_SIZE;  // 根据需要调整
 }
+

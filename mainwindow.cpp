@@ -11,11 +11,23 @@ MainWindow::MainWindow(QWidget *parent)
     oinfos.append(OperatorInfo("t1","o1"));
     oinfos.append(OperatorInfo("t1","o2"));
     oinfos.append(OperatorInfo("t2","o3"));
-
     ui->toolBox->listOperator(oinfos);
+
+    ui->view->setScene(new OperatorScene);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+MainWindow& MainWindow::instance()
+{
+    static MainWindow mainWindow;
+    return mainWindow;
+}
+
+MainWindow *MainWindow::instancePtr()
+{
+    return &instance();
 }

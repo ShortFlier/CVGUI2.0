@@ -38,7 +38,7 @@
         </attribute>
        </widget>
       </widget>
-      <widget class="QWidget" name="widget" native="true"/>
+      <widget class="OperatorView" name="view" native="true"/>
       <widget class="QSplitter" name="splitter">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -78,6 +78,12 @@
    <class>OperatorSelector</class>
    <extends>QToolBox</extends>
    <header location="global">operatorselector.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>OperatorView</class>
+   <extends>QWidget</extends>
+   <header location="global">operatorview.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
