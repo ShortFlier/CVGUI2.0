@@ -34,6 +34,7 @@ void OperatorSelector::listOperator(const QList<OperatorInfo>& oinfos)
         for(int i=0; i<infos.size(); ++i){
             QTableWidgetItem* item=new QTableWidgetItem;
             item->setText(infos[i].opName);
+            item->setData(Qt::UserRole+1, infos[i].iconPath);
 
             QIcon icon(infos[i].iconPath);
             if(icon.isNull())

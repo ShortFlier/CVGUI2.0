@@ -6,6 +6,7 @@
 #include <spdlog/details/os.h>
 
 #include <QDateTime>
+#include <QMessageBox>
 
 bool isControl=true;
 bool isFile=false;
@@ -69,4 +70,19 @@ void setPattern(const std::string &pattern)
     if(fileLogger){
         fileLogger->set_pattern(logPattern);
     }
+}
+
+void tip_info(const QString &content, const QString &title)
+{
+    QMessageBox::information(nullptr, title, content);
+}
+
+void tip_warn(const QString &content, const QString &title)
+{
+    QMessageBox::warning(nullptr, title, content);
+}
+
+void tip_error(const QString &content, const QString &title)
+{
+    QMessageBox::critical(nullptr, title, content);
 }

@@ -1,10 +1,14 @@
 ﻿#include "operatorscene.h"
-
+#include "log.h"
+#include "commongraphicsblock.h"
 #include <QGraphicsRectItem>
 
-OperatorScene::OperatorScene(QObject *parent)
-    : QGraphicsScene{parent}
+OperatorScene::OperatorScene(OperatorScene *parent)
 {
+    _blockCtrl=new OpGraphicsBlockCtrl;
+
+    setParentScene(parent);
+
     setSceneRect(FIXED_SCENE_RECT);
 
     _viewRect=new QGraphicsRectItem;
@@ -16,6 +20,11 @@ OperatorScene::OperatorScene(QObject *parent)
     _viewRect->setPen(pen);
 }
 
+OperatorScene::~OperatorScene()
+{
+    delete _blockCtrl;
+}
+
 void OperatorScene::viewRect(QRectF rect)
 {
     QPoint p(10,10);
@@ -23,3 +32,19 @@ void OperatorScene::viewRect(QRectF rect)
 
     _viewRect->setRect(r);
 }
+
+void OperatorScene::createItem(const QString &className, QPointF pos, const QString &iconPath)
+{
+    QString opName=className+QString::number(_nums);
+
+    if(_blockCtrl->contains(opName)){
+        tip_warn("算子名称重复："+opName);
+    }else{
+        OpGraphicsBlock* block=new CommonGraphicsBlock(opName,className,iconPath);
+        addItem(block);
+        block->setPos(pos);
+        log_info("添加算子：{0}", opName.toStdString());
+    }
+    ++_nums;
+}
+

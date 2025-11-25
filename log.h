@@ -1,8 +1,19 @@
 ﻿#ifndef LOG_H
 #define LOG_H
 
+#include <QString>
 #include <string>
 #include <spdlog/spdlog.h>
+
+/*
+ *QT信息提升弹窗
+ */
+
+void tip_info(const QString& content, const QString& title="info");
+
+void tip_warn(const QString& content, const QString& title="warn");
+
+void tip_error(const QString& content, const QString& title="error");
 
 
 void initLogger(bool clog=true, bool flog=false);
