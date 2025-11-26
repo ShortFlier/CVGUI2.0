@@ -20,13 +20,6 @@ public:
     void setStatusFocus(int status)override;
 
 protected:
-    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)override;
-
-    void mousePressEvent(QGraphicsSceneMouseEvent *event)override;
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event)override;
-
-    void hoverEnterEvent(QGraphicsSceneHoverEvent *event)override;
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event)override;
 
 private:
     QString _iconPath;

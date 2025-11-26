@@ -53,10 +53,10 @@ bool OperatorView::eventFilter(QObject *watched, QEvent *event)
 void OperatorView::newSceneProject()
 {
     if(_sceneProject){
-        _sceneProject->deleteLater();
-        _sceneProject=nullptr;
+        _sceneProject->clear();
+    }else{
+        _sceneProject=SceneProject::instancePtr();
     }
-    _sceneProject=new SceneProject;
 }
 
 
@@ -82,6 +82,7 @@ OpGraphicsView::OpGraphicsView(QWidget *parent)
 void OpGraphicsView::setScene(OperatorScene *scene)
 {
     _scene=scene;
+    connect(_scene, &::OperatorScene::upper, this, &OpGraphicsView::showUpper);
 
     QGraphicsView::setScene(scene);
 }
@@ -110,6 +111,12 @@ void OpGraphicsView::dropEvent(QDropEvent *event)
     parseMimeData(mime, className, iconPath);
     QPointF scenePos=mapToScene(event->position().toPoint());
     _scene->createItem(className, scenePos, iconPath);
+}
+
+void OpGraphicsView::showUpper()
+{
+    OperatorScene *scene=static_cast<OperatorScene *>(sender());
+    setScene(scene);
 }
 
 void OpGraphicsView::paintEvent(QPaintEvent *event)

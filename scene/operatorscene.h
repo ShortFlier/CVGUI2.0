@@ -33,6 +33,17 @@ public:
         setParent(parent);
     }
 
+public slots:
+    void changeOpName(const QString& oldName, const QString& newName);
+    void deleteBlock(const QString& opName);
+    void moveBlock(const QPointF& newScenePos);
+    void clickBlock(const QString& opName);
+    void doubleClickBlock(const QString& opName);
+
+protected:
+    //返回上一层
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *contextMenuEvent) override;
+
 private:
     QGraphicsRectItem* _viewRect;
 
@@ -43,6 +54,7 @@ private:
 
     OpGraphicsBlockCtrl* _blockCtrl=nullptr;
 signals:
+    void upper();
 };
 
 /*
@@ -51,6 +63,9 @@ signals:
  */
 class OpGraphicsBlockCtrl:public QMap<QString, OpGraphicsBlock*>{
 public:
+    OpGraphicsBlock* addBlock(const QString& opName, const QString &className, const QString &iconPath);
+    OpGraphicsBlock* deleteBlock(const QString& opName);
+    bool renameBlock(const QString& oldName, const QString& newName);
 };
 
 #endif // OPERATORSCENE_H

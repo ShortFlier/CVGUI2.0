@@ -13,7 +13,6 @@ class SceneProject : public QObject
 {
     Q_OBJECT
 public:
-    explicit SceneProject(QObject *parent = nullptr);
     ~SceneProject();
 
     OperatorScene* addProjects(const QString& name=QString());
@@ -21,7 +20,15 @@ public:
         return _subProjects;
     }
 
+    //清理所有的OperatorScene
+    void clear();
+
+    static SceneProject& instance();
+    static SceneProject* instancePtr();
+
 private:
+    explicit SceneProject(QObject *parent = nullptr);
+
     QMap<QString, OperatorScene*> _subProjects;
 
     int _nums=0;

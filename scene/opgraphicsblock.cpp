@@ -12,6 +12,11 @@ OpGraphicsBlock::OpGraphicsBlock(const QString &opName, const QString &className
 :_opName(opName),_className(className){
     _status=No;
 
+
+    setFlag(ItemIsMovable, true);
+    setFlag(ItemSendsGeometryChanges, true);
+    setAcceptHoverEvents(true);
+
     _leftDot=new OpGraphicsDot(QRectF(-GRAPHICSDOT_RADIUS, -GRAPHICSDOT_RADIUS, 2*GRAPHICSDOT_RADIUS, 2*GRAPHICSDOT_RADIUS), this);
     _rightDot=new OpGraphicsDot(QRectF(-GRAPHICSDOT_RADIUS, -GRAPHICSDOT_RADIUS, 2*GRAPHICSDOT_RADIUS, 2*GRAPHICSDOT_RADIUS), this);
     _topDot=new OpGraphicsDot(QRectF(-GRAPHICSDOT_RADIUS, -GRAPHICSDOT_RADIUS, 2*GRAPHICSDOT_RADIUS, 2*GRAPHICSDOT_RADIUS), this);
@@ -22,6 +27,12 @@ OpGraphicsBlock::OpGraphicsBlock(const QString &opName, const QString &className
     _text=new OpGraphicsText(this);
     _text->setText(opName);
     connect(_text, &OpGraphicsText::textChanged, this, &OpGraphicsBlock::tryChangeOpName);
+}
+
+void OpGraphicsBlock::setOpName(const QString &name)
+{
+    _opName=name;
+    _text->setText(_opName);
 }
 
 QPointF OpGraphicsBlock::getStartPos(OpGraphicsDot *dot)
@@ -71,6 +82,16 @@ void OpGraphicsBlock::move(qreal dx, qreal dy)
     setPos(scenePos()+QPointF(dx,dy));
 }
 
+QVariant OpGraphicsBlock::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    if(change==GraphicsItemChange::ItemPositionHasChanged){
+        QPointF newScenePos=value.toPointF();
+        emit moved(newScenePos);
+    }
+
+    return QGraphicsItem::itemChange(change, value);
+}
+
 void OpGraphicsBlock::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     QMenu menu;
@@ -86,6 +107,48 @@ void OpGraphicsBlock::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 
     }
 }
+
+void OpGraphicsBlock::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    emit doubleClicked(_opName);
+
+    QGraphicsItem::mouseDoubleClickEvent(event);
+}
+
+
+void OpGraphicsBlock::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if(event->button()==Qt::LeftButton)
+        setCursor(Qt::SizeAllCursor);
+
+    emit clicked(_opName);
+
+    QGraphicsItem::mousePressEvent(event);
+}
+
+void OpGraphicsBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    setCursor(Qt::ArrowCursor);
+
+    QGraphicsItem::mouseReleaseEvent(event);
+}
+
+void OpGraphicsBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+    setStatus(Active);
+    setDotVisible(true);
+
+    QGraphicsItem::hoverEnterEvent(event);
+}
+
+void OpGraphicsBlock::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    setStatus(No);
+    setDotVisible(false);
+
+    QGraphicsItem::hoverLeaveEvent(event);
+}
+
 
 OpGraphicsBlock::~OpGraphicsBlock()
 {
@@ -107,12 +170,18 @@ void OpGraphicsDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 {
     QStyleOptionGraphicsItem styleOption = *option;
     styleOption.state &= ~QStyle::State_Selected;
+
     QGraphicsEllipseItem::paint(painter, &styleOption, widget);
 }
 
 QPointF OpGraphicsDot::center()
 {
     return mapToScene(pos());
+}
+
+OpGraphicsBlock *OpGraphicsDot::block()
+{
+    return static_cast<OpGraphicsBlock*>(parentItem());
 }
 
 
@@ -138,12 +207,14 @@ void OpGraphicsText::focusOutEvent(QFocusEvent *event)
     }
     reRender();
     setTextInteractionFlags(Qt::NoTextInteraction);
+
     QGraphicsTextItem::focusOutEvent(event);
 }
 
 void OpGraphicsText::focusInEvent(QFocusEvent *event)
 {
     setPlainText(_srcText);
+
     QGraphicsTextItem::focusInEvent(event);
 }
 

@@ -24,7 +24,7 @@ public:
     virtual ~OpGraphicsBlock()=0;
 
     QString opName(){return _opName;}
-    void setOpName(const QString& name){_opName=name;}
+    void setOpName(const QString& name);
 
     QString className(){return _className;}
 
@@ -51,7 +51,19 @@ public slots:
     void move(qreal dx, qreal dy);
 
 protected:
+    //图形项移动发射moved信号
+    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)override;
+    //右键菜单
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+    //鼠标双击发射双击事件
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)override;
+
+    //左键按下设置指针为移动样式，发射点击事件
+    void mousePressEvent(QGraphicsSceneMouseEvent *event)override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event)override;
+    //鼠标和离开改变边框颜色
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event)override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event)override;
 
     int _status;
 
@@ -69,6 +81,8 @@ signals:
     void tryChangeOpName(const QString& oldName, const QString& newName);
     void deleted(const QString& opName);
     void moved(const QPointF& newScenePos);
+    void clicked(const QString& opName);
+    void doubleClicked(const QString& opName);
 };
 
 
@@ -85,6 +99,8 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
     QPointF center();
+
+    OpGraphicsBlock* block();
 };
 
 /*

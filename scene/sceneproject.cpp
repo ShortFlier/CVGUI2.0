@@ -10,9 +10,7 @@ SceneProject::SceneProject(QObject *parent)
 
 SceneProject::~SceneProject()
 {
-    for(auto itr=_subProjects.begin(); itr!=_subProjects.end(); ++itr){
-        itr.value()->deleteLater();
-    }
+    clear();
 }
 
 OperatorScene *SceneProject::addProjects(const QString &name)
@@ -29,7 +27,6 @@ OperatorScene *SceneProject::addProjects(const QString &name)
     if(_subProjects.contains(pname)){
         QString str("子工程[%1]已存在！");
         str=str.arg(pname);
-        log_warn(str.toStdString());
         tip_warn(str);
     }else{
         scene=new OperatorScene;
@@ -40,4 +37,23 @@ OperatorScene *SceneProject::addProjects(const QString &name)
     ++_nums;
 
     return scene;
+}
+
+void SceneProject::clear()
+{
+    for(auto itr=_subProjects.begin(); itr!=_subProjects.end(); ++itr){
+        itr.value()->deleteLater();
+    }
+    _subProjects.clear();
+}
+
+SceneProject &SceneProject::instance()
+{
+    static SceneProject pjt;
+    return pjt;
+}
+
+SceneProject *SceneProject::instancePtr()
+{
+    return &(instance());
 }

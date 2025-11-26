@@ -53,6 +53,9 @@ public:
     void dragMoveEvent(QDragMoveEvent *event) override;
     void dropEvent(QDropEvent *event) override;
 
+public slots:
+    void showUpper();
+
 protected:
     void paintEvent(QPaintEvent *event) override;
 

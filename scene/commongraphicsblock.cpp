@@ -26,9 +26,6 @@ CommonGraphicsBlock::CommonGraphicsBlock(const QString &opName, const QString &c
 
     _dots={_leftDot, _rightDot, _topDot, _bottomDot};
 
-    setFlag(ItemIsMovable, true);
-    setFlag(ItemSendsGeometryChanges, true);
-    setAcceptHoverEvents(true);
 }
 
 QRectF CommonGraphicsBlock::boundingRect() const
@@ -74,40 +71,5 @@ void CommonGraphicsBlock::setStatusFocus(int status)
 {
     OpGraphicsBlock::setStatusFocus(status);
     update();
-}
-
-
-QVariant CommonGraphicsBlock::itemChange(GraphicsItemChange change, const QVariant &value)
-{
-    if(change==GraphicsItemChange::ItemPositionHasChanged){
-        QPointF newScenePos=value.toPointF();
-        emit moved(newScenePos);
-    }
-
-    return QGraphicsItem::itemChange(change, value);
-}
-
-void CommonGraphicsBlock::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    if(event->button()==Qt::LeftButton)
-        setCursor(Qt::SizeAllCursor);
-}
-
-void CommonGraphicsBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    setCursor(Qt::ArrowCursor);
-    QGraphicsItem::mouseReleaseEvent(event);
-}
-
-void CommonGraphicsBlock::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
-{
-    setStatus(Active);
-    setDotVisible(true);
-}
-
-void CommonGraphicsBlock::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-{
-    setStatus(No);
-    setDotVisible(false);
 }
 
