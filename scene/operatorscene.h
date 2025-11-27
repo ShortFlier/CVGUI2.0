@@ -2,6 +2,8 @@
 #define OPERATORSCENE_H
 
 #include "opgraphicsblock.h"
+#include "linepath.h"
+
 #include <QGraphicsScene>
 #include <QDragEnterEvent>
 
@@ -28,21 +30,33 @@ public:
 
     void createItem(const QString& className, QPointF pos, const QString& iconPath);
 
-    void setParentScene(OperatorScene* parent){
-        _parent=parent;
-        setParent(parent);
-    }
+    void setParentScene(OperatorScene* parent);
+
+    //尝试获取点上的OpGraphicsBlock
+    OpGraphicsBlock* getBlockByPos(const QPointF& scenePos);
+
+    LinePathCtrl& lineCtrl();
+    OpGraphicsBlockCtrl& blockCtrl();
+
+    OperatorScene* parentScene();
+    QMap<QString, OperatorScene*>& childrenScenes();
 
 public slots:
     void changeOpName(const QString& oldName, const QString& newName);
     void deleteBlock(const QString& opName);
     void moveBlock(const QPointF& newScenePos);
     void clickBlock(const QString& opName);
+    //如果点击的是嵌套算子，显示
     void doubleClickBlock(const QString& opName);
 
 protected:
     //返回上一层
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *contextMenuEvent) override;
+
+    //连线
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)override;
+    void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)override;
 
 private:
     QGraphicsRectItem* _viewRect;
@@ -53,8 +67,17 @@ private:
     QMap<QString, OperatorScene*> _childrens;
 
     OpGraphicsBlockCtrl* _blockCtrl=nullptr;
+
+    LinePathCtrl _lineCtrl;
+
+    //临时连线
+    LinePath* _tempLine=nullptr;
+    OpGraphicsDot* _startDot=nullptr;
+    //是否连线
+    bool _isLine=false;
+
 signals:
-    void upper();
+    void showScene(QGraphicsScene* scene);
 };
 
 /*

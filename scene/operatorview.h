@@ -54,7 +54,7 @@ public:
     void dropEvent(QDropEvent *event) override;
 
 public slots:
-    void showUpper();
+    void showScene(QGraphicsScene* scene);
 
 protected:
     void paintEvent(QPaintEvent *event) override;

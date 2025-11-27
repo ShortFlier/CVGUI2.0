@@ -152,7 +152,6 @@ void OpGraphicsBlock::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 OpGraphicsBlock::~OpGraphicsBlock()
 {
-
 }
 
 OpGraphicsDot::OpGraphicsDot(const QRectF &rect, QGraphicsItem *parent)
@@ -217,4 +216,5 @@ void OpGraphicsText::focusInEvent(QFocusEvent *event)
 
     QGraphicsTextItem::focusInEvent(event);
 }
+
 

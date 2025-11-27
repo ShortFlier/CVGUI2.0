@@ -22,6 +22,7 @@ OperatorScene::OperatorScene(OperatorScene *parent)
     pen.setWidth(10);
     pen.setColor(Qt::green);
     _viewRect->setPen(pen);
+
 }
 
 OperatorScene::~OperatorScene()
@@ -59,6 +60,41 @@ void OperatorScene::createItem(const QString &className, QPointF pos, const QStr
     ++_nums;
 }
 
+void OperatorScene::setParentScene(OperatorScene *parent){
+    _parent=parent;
+    setParent(parent);
+}
+
+OpGraphicsBlock *OperatorScene::getBlockByPos(const QPointF &scenePos)
+{
+    QGraphicsItem *item=itemAt(scenePos, QTransform());
+    //不为LinePath
+    LinePath* line=dynamic_cast<LinePath*>(item);
+    if(!line && item){
+        while(item->parentItem()){
+            item=item->parentItem();
+        }
+        return static_cast<OpGraphicsBlock *>(item);
+    }else
+        return nullptr;
+}
+
+LinePathCtrl &OperatorScene::lineCtrl(){
+    return _lineCtrl;
+}
+
+OpGraphicsBlockCtrl &OperatorScene::blockCtrl(){
+    return *_blockCtrl;
+}
+
+OperatorScene *OperatorScene::parentScene(){
+    return _parent;
+}
+
+QMap<QString, OperatorScene *> &OperatorScene::childrenScenes(){
+    return _childrens;
+}
+
 void OperatorScene::changeOpName(const QString &oldName, const QString &newName)
 {
     if(_blockCtrl->renameBlock(oldName, newName)){
@@ -82,17 +118,14 @@ void OperatorScene::deleteBlock(const QString &opName)
 
 void OperatorScene::moveBlock(const QPointF &newScenePos)
 {
-
 }
 
 void OperatorScene::clickBlock(const QString &opName)
 {
-
 }
 
 void OperatorScene::doubleClickBlock(const QString &opName)
 {
-
 }
 
 void OperatorScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *contextMenuEvent)
@@ -101,9 +134,47 @@ void OperatorScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *contextMenu
         QMenu menu;
         QAction* act=menu.addAction("上一层");
         if(act==menu.exec(contextMenuEvent->screenPos())){
-            emit upper();
+            emit showScene(_parent);
         }
     }
+}
+
+void OperatorScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
+{
+    if(_isLine){
+        removeItem(_tempLine);
+        delete _tempLine;
+        QPointF scenePos=mouseEvent->scenePos();
+        _tempLine=LinePath::getLinePath(_startDot->block(), scenePos, this);
+    }
+
+    QGraphicsScene::mouseMoveEvent(mouseEvent);
+}
+
+void OperatorScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
+{
+    QPointF scenePos=mouseEvent->scenePos();
+    QGraphicsItem *item=itemAt(scenePos, QTransform());
+    OpGraphicsDot* dot=dynamic_cast<OpGraphicsDot*>(item);
+    if(dot){
+        _isLine=true;
+        _startDot=dot;
+    }
+
+    QGraphicsScene::mousePressEvent(mouseEvent);
+}
+
+void OperatorScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
+{
+    if(_isLine){
+        QPointF scenePos=mouseEvent->scenePos();
+
+        _isLine=false;
+        removeItem(_tempLine);
+        delete _tempLine;
+    }
+
+    QGraphicsScene::mouseReleaseEvent(mouseEvent);
 }
 
 

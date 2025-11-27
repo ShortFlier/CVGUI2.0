@@ -82,7 +82,7 @@ OpGraphicsView::OpGraphicsView(QWidget *parent)
 void OpGraphicsView::setScene(OperatorScene *scene)
 {
     _scene=scene;
-    connect(_scene, &::OperatorScene::upper, this, &OpGraphicsView::showUpper);
+    connect(_scene, &::OperatorScene::showScene, this, &OpGraphicsView::showScene);
 
     QGraphicsView::setScene(scene);
 }
@@ -113,11 +113,11 @@ void OpGraphicsView::dropEvent(QDropEvent *event)
     _scene->createItem(className, scenePos, iconPath);
 }
 
-void OpGraphicsView::showUpper()
+void OpGraphicsView::showScene(QGraphicsScene *scene)
 {
-    OperatorScene *scene=static_cast<OperatorScene *>(sender());
-    setScene(scene);
+    setScene(static_cast<OperatorScene*>(scene));
 }
+
 
 void OpGraphicsView::paintEvent(QPaintEvent *event)
 {

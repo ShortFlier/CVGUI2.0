@@ -86,6 +86,8 @@ signals:
 };
 
 
+
+
 /*
  * 可连线的点
  */
@@ -127,5 +129,9 @@ private:
 signals:
     void textChanged(const QString& oldText, const QString& newText);
 };
+
+
+
+
 
 #endif // OPGRAPHICSBLOCK_H
