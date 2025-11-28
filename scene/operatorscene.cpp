@@ -68,6 +68,8 @@ void OperatorScene::setParentScene(OperatorScene *parent){
 OpGraphicsBlock *OperatorScene::getBlockByPos(const QPointF &scenePos)
 {
     QGraphicsItem *item=itemAt(scenePos, QTransform());
+    if(item==_viewRect)
+        return nullptr;
     //不为LinePath
     LinePath* line=dynamic_cast<LinePath*>(item);
     if(!line && item){
@@ -118,6 +120,8 @@ void OperatorScene::deleteBlock(const QString &opName)
 
 void OperatorScene::moveBlock(const QPointF &newScenePos)
 {
+    OpGraphicsBlock* block=static_cast<OpGraphicsBlock*>(sender());
+    _lineCtrl.reLine(block);
 }
 
 void OperatorScene::clickBlock(const QString &opName)
@@ -142,10 +146,26 @@ void OperatorScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *contextMenu
 void OperatorScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     if(_isLine){
-        removeItem(_tempLine);
+        if(_tempLine)
+            removeItem(_tempLine);
         delete _tempLine;
+
         QPointF scenePos=mouseEvent->scenePos();
-        _tempLine=LinePath::getLinePath(_startDot->block(), scenePos, this);
+
+        //如果pos上有block，且不为dot的block，绘制到block
+        OpGraphicsBlock* block=getBlockByPos(scenePos);
+        if(block && block!=_startDot->block())
+            _tempLine=LinePath::getLinePath(_startDot, block);
+        else
+            _tempLine=LinePath::getLinePath(_startDot, scenePos);
+
+        //合法性判断
+        QPen pen=_tempLine->pen();
+        pen.setColor(LINEPATH_INVALID_COLOR);
+        if(!_lineCtrl.isValid(Dependency(_startDot->block(),block)))
+            _tempLine->setPen(pen);
+
+        addItem(_tempLine);
     }
 
     QGraphicsScene::mouseMoveEvent(mouseEvent);
@@ -169,9 +189,18 @@ void OperatorScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
     if(_isLine){
         QPointF scenePos=mouseEvent->scenePos();
 
+        OpGraphicsBlock* block=getBlockByPos(scenePos);
+        if(block){
+            Dependency depend(_startDot->block(), block);
+            LinePath* linePath=_lineCtrl.add(depend);
+            if(linePath)
+                addItem(linePath);
+        }
+
         _isLine=false;
         removeItem(_tempLine);
         delete _tempLine;
+        _tempLine=nullptr;
     }
 
     QGraphicsScene::mouseReleaseEvent(mouseEvent);

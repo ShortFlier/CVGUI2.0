@@ -51,6 +51,36 @@ QPointF OpGraphicsBlock::getStartPos(OpGraphicsDot *dot)
     return pos;
 }
 
+bool OpGraphicsBlock::inX(OpGraphicsDot *dot)
+{
+    return dot==_leftDot || dot==_rightDot;
+}
+
+bool OpGraphicsBlock::inY(OpGraphicsDot *dot)
+{
+    return dot==_topDot || dot==_bottomDot;
+}
+
+OpGraphicsDot *OpGraphicsBlock::getXDot(const QPointF &scenePos)
+{
+    qreal l,r;
+    QLineF line(_leftDot->center(), scenePos);
+    l=line.length();
+    line.setPoints(_rightDot->center(), scenePos);
+    r=line.length();
+    return l<r?_leftDot:_rightDot;
+}
+
+OpGraphicsDot *OpGraphicsBlock::getYDot(const QPointF &scenePos)
+{
+    qreal t,b;
+    QLineF line(_topDot->center(), scenePos);
+    t=line.length();
+    line.setPoints(_bottomDot->center(), scenePos);
+    b=line.length();
+    return t<b?_topDot:_bottomDot;
+}
+
 void OpGraphicsBlock::setDotVisible(bool b)
 {
     _leftDot->setVisible(b);
@@ -175,7 +205,7 @@ void OpGraphicsDot::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 
 QPointF OpGraphicsDot::center()
 {
-    return mapToScene(pos());
+    return scenePos();
 }
 
 OpGraphicsBlock *OpGraphicsDot::block()

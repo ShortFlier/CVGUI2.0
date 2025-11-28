@@ -28,13 +28,19 @@ public:
 
     QString className(){return _className;}
 
-    OpGraphicsDot* leftDot();
-    OpGraphicsDot* rightDot();
-    OpGraphicsDot* topDot();
-    OpGraphicsBlock* bottomDot();
+    OpGraphicsDot* leftDot(){return _leftDot;}
+    OpGraphicsDot* rightDot(){return _rightDot;}
+    OpGraphicsDot* topDot(){return _topDot;}
+    OpGraphicsDot* bottomDot(){return _bottomDot;}
 
     //获取连线起始点
     virtual QPointF getStartPos(OpGraphicsDot* dot);
+
+    bool inX(OpGraphicsDot* dot);
+    bool inY(OpGraphicsDot* dot);
+    //给定一个点，获取x,y方向最靠近点的dot
+    OpGraphicsDot* getXDot(const QPointF& scenePos);
+    OpGraphicsDot* getYDot(const QPointF& scenePos);
 
     virtual void setDotVisible(bool b);
 
