@@ -9,12 +9,13 @@
 const QList<QColor> OpGraphicsBlock::statusColors={Qt::black, Qt::blue, Qt::green, Qt::red};
 
 OpGraphicsBlock::OpGraphicsBlock(const QString &opName, const QString &className, const QString &iconPath)
-:_opName(opName),_className(className){
+    :_opName(opName),_className(className),_iconPath(iconPath){
     _status=No;
 
 
     setFlag(ItemIsMovable, true);
     setFlag(ItemSendsGeometryChanges, true);
+    setFlag(ItemIsFocusable, true);
     setAcceptHoverEvents(true);
 
     _leftDot=new OpGraphicsDot(QRectF(-GRAPHICSDOT_RADIUS, -GRAPHICSDOT_RADIUS, 2*GRAPHICSDOT_RADIUS, 2*GRAPHICSDOT_RADIUS), this);
@@ -125,6 +126,9 @@ QVariant OpGraphicsBlock::itemChange(GraphicsItemChange change, const QVariant &
 void OpGraphicsBlock::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     QMenu menu;
+    QAction* title = menu.addAction(_opName);
+    title->setDisabled(true);
+    title->setIcon(QIcon(_iconPath));
     QAction* rename=menu.addAction("重命名");
     QAction* dlt=menu.addAction("删除");
     QAction* act=menu.exec(event->screenPos());
@@ -136,6 +140,8 @@ void OpGraphicsBlock::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     }else{
 
     }
+
+    QGraphicsItem::contextMenuEvent(event);
 }
 
 void OpGraphicsBlock::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)

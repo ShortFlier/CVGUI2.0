@@ -1,22 +1,33 @@
 ﻿#include "linepath.h"
 #include "utility.h"
 
+#include <QGraphicsSceneContextMenuEvent>
+#include <QMenu>
 #include <QPen>
 #include <QRandomGenerator>
-
-
+#include <QStyle>
+#include <QStyleOptionGraphicsItem>
 
 
 LinePath::LinePath(QGraphicsItem *parent)
-:QGraphicsPathItem(parent){
-
+    :QGraphicsPathItem(parent){
+    setFlag(ItemIsSelectable, true);
+    setFlag(ItemIsFocusable, true);
 }
+
 
 LinePath::LinePath(const Dependency &depend, QGraphicsItem *parent)
-    :QGraphicsPathItem(parent), _depend(depend) {
-
+    :LinePath(parent){
+    _depend=depend;
 }
 
+void LinePath::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    QStyleOptionGraphicsItem styleOption = *option;
+    styleOption.state &= ~QStyle::State_Selected;
+
+    QGraphicsPathItem::paint(painter, &styleOption, widget);
+}
 
 void LinePath::reLine()
 {
@@ -32,7 +43,19 @@ LinePath *LinePath::getLinePath(OpGraphicsDot *dot, OpGraphicsBlock *block)
 
     OpGraphicsDot* near=distance(xdot->center(),dot->center())<distance(ydot->center(),dot->center())?xdot:ydot;
     QPointF end=block->getStartPos(near);
+    //绘制到block的startPos
     LinePath* linePath=getLinePath(dot, end);
+    //检查连线是否会在block内部
+    if(block->contains(block->mapFromScene(linePath->_pathPoints.at(3)))){
+        //重新获取block的绘制点
+        delete linePath;
+        QPointF npos(block->getStartPos(xdot).x(), block->getStartPos(ydot).y());
+        linePath=getLinePath(dot, npos);
+        QPainterPath path=linePath->path();
+        linePath->lineTo(path, end);
+        linePath->setPath(path);
+    }
+
     //绘制end->near.center，带箭头
     QPainterPath path=linePath->path();
     drawArrow(path, end, near->center(), GRAPHICSDOT_RADIUS*2);
@@ -78,6 +101,52 @@ void LinePath::drawArrow(QPainterPath& path, const QPointF &from, const QPointF 
     path.moveTo(to);
 }
 
+void LinePath::focusInEvent(QFocusEvent *event)
+{
+    QPen p=pen();
+    p.setColor(LINEPATH_ACTIVE_COLOR);
+    setPen(p);
+
+    QGraphicsPathItem::focusInEvent(event);
+}
+
+void LinePath::focusOutEvent(QFocusEvent *event)
+{
+    QPen p=pen();
+    p.setColor(LINEPATH_VALID_COLOR);
+    setPen(p);
+
+    QGraphicsPathItem::focusOutEvent(event);
+}
+
+void LinePath::contextMenuEvent(QGraphicsSceneContextMenuEvent *contextMenuEvent)
+{
+    QMenu menu;
+    menu.addAction(QString("[%1]==>[%2]").arg(_depend.from->opName()).arg(_depend.to->opName()))->setDisabled(true);
+    QAction* act=menu.addAction("删除");
+    if(act==menu.exec(contextMenuEvent->screenPos())){
+        emit deleted(_depend);
+    }
+
+    QGraphicsPathItem::contextMenuEvent(contextMenuEvent);
+}
+
+void LinePath::lineTo(QPainterPath& path, const QPointF &p)
+{
+    path.lineTo(p);
+    path.moveTo(p);
+    _pathPoints.append(p);
+}
+
+void LinePath::lineTo(QPainterPath &path, const QList<QPointF> &ps)
+{
+    path.moveTo(ps[0]);
+    _pathPoints.append(ps[0]);
+    for(int i=1;i<ps.size();++i){
+        lineTo(path, ps[i]);
+    }
+}
+
 LinePath *LinePath::getLinePath(OpGraphicsDot *dot, const QPointF& scenePos)
 {
     LinePath* line=new LinePath;
@@ -121,19 +190,8 @@ LinePath *LinePath::getLinePath(OpGraphicsDot *dot, const QPointF& scenePos)
 
     //绘制线条：dot.center->dot.start->p1->p2->p3
     QPainterPath path;
-    path.moveTo(dot->center());
-
-    path.lineTo(dotStart);
-    path.moveTo(dotStart);
-
-    path.lineTo(p1);
-    path.moveTo(p1);
-
-    path.lineTo(p2);
-    path.moveTo(p2);
-
-    path.lineTo(p3);
-    path.moveTo(p3);
+    QList<QPointF> ps={dot->center(), dotStart, p1, p2, p3};
+    line->lineTo(path, ps);
 
     line->setPath(path);
     return line;

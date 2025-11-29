@@ -8,7 +8,7 @@
 #define COMMONBLOCK_PADDING 5
 
 CommonGraphicsBlock::CommonGraphicsBlock(const QString &opName, const QString &className, const QString &iconPath)
-    :OpGraphicsBlock(opName, className, iconPath),_iconPath(iconPath){
+    :OpGraphicsBlock(opName, className, iconPath){
     constexpr int w=COMMONBLOCK_PADDING+COMMONBLOCK_ICON_SIZE+COMMONBLOCK_PADDING+GRAPHICSTEXT_WIDTH+COMMONBLOCK_PADDING;
     constexpr int h=COMMONBLOCK_PADDING+COMMONBLOCK_ICON_SIZE+COMMONBLOCK_PADDING;
 

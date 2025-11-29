@@ -16,9 +16,7 @@ public:
     ~SceneProject();
 
     OperatorScene* addProjects(const QString& name=QString());
-    QMap<QString, OperatorScene*> subProjects(){
-        return _subProjects;
-    }
+    QMap<QString, OperatorScene*>& subProjects();
 
     //清理所有的OperatorScene
     void clear();

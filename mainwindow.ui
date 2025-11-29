@@ -16,11 +16,11 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QSplitter" name="splitter_2">
+     <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="OperatorSelector" name="toolBox">
+      <widget class="OperatorSelector" name="opBox">
        <property name="currentIndex">
         <number>0</number>
        </property>
@@ -38,13 +38,13 @@
         </attribute>
        </widget>
       </widget>
-      <widget class="OperatorView" name="view" native="true"/>
-      <widget class="QSplitter" name="splitter">
+      <widget class="OperatorView" name="projectEdit" native="true"/>
+      <widget class="QSplitter" name="opView">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
-       <widget class="QWidget" name="widget_2" native="true"/>
-       <widget class="QWidget" name="widget_3" native="true"/>
+       <widget class="QWidget" name="opResult" native="true"/>
+       <widget class="QWidget" name="opSet" native="true"/>
       </widget>
      </widget>
     </item>

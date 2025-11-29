@@ -22,8 +22,9 @@ struct Dependency{
 };
 
 
-#define LINEPATH_VALID_COLOR Qt::blue
+#define LINEPATH_VALID_COLOR Qt::black
 #define LINEPATH_INVALID_COLOR Qt::red
+#define LINEPATH_ACTIVE_COLOR Qt::blue
 
 #define LINEPATH_WIDTH 3
 
@@ -35,6 +36,10 @@ class LinePath:public QObject, public QGraphicsPathItem
 public:
     LinePath(QGraphicsItem *parent = nullptr);
     LinePath(const Dependency& depend, QGraphicsItem *parent = nullptr);
+
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
+
+
     Dependency _depend;
 
     //根据当前Dependency重新绘制连线
@@ -50,6 +55,18 @@ public:
     //绘制由from->to的箭头
     static void drawArrow(QPainterPath& path, const QPointF& from, const QPointF& to,
                           double arrowSize = 10.0, double arrowAngle = 30.0);
+
+protected:
+    void focusInEvent(QFocusEvent *event)override;
+    void focusOutEvent(QFocusEvent *event)override;
+
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *contextMenuEvent) override;
+
+private:
+    void lineTo(QPainterPath& path, const QPointF& p);
+    void lineTo(QPainterPath& path, const QList<QPointF>& p);
+
+    QList<QPointF> _pathPoints;
 
 signals:
     void deleted(const Dependency& depend);

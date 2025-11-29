@@ -83,6 +83,8 @@ protected:
 
     OpGraphicsText* _text;
 
+    QString _iconPath;
+
 signals:
     void tryChangeOpName(const QString& oldName, const QString& newName);
     void deleted(const QString& opName);

@@ -7,8 +7,8 @@
 #include <QGraphicsSceneContextMenuEvent>
 
 
-OperatorScene::OperatorScene(OperatorScene *parent)
-{
+OperatorScene::OperatorScene(const QString& sceneName, OperatorScene *parent)
+    :_sceneName(sceneName){
     _blockCtrl=new OpGraphicsBlockCtrl;
 
     setParentScene(parent);
@@ -38,26 +38,57 @@ void OperatorScene::viewRect(QRectF rect)
     _viewRect->setRect(r);
 }
 
-void OperatorScene::createItem(const QString &className, QPointF pos, const QString &iconPath)
+void OperatorScene::createItem(const QString &className, const QPointF& pos, const QString &iconPath)
 {
     QString opName=className+QString::number(_nums);
 
-    OpGraphicsBlock* block=_blockCtrl->addBlock(opName, className, iconPath);
-    if(!block){
+    if(_blockCtrl->contains(opName)){
         tip_warn("算子名称重复："+opName);
     }else{
-        addItem(block);
-        block->setPos(pos);
 
-        connect(block, &OpGraphicsBlock::tryChangeOpName, this, &OperatorScene::changeOpName);
-        connect(block, &OpGraphicsBlock::deleted, this, &OperatorScene::deleteBlock);
-        connect(block, &OpGraphicsBlock::moved, this, &OperatorScene::moveBlock);
-        connect(block, &OpGraphicsBlock::clicked, this, &OperatorScene::clickBlock);
-        connect(block, &OpGraphicsBlock::doubleClicked, this, &OperatorScene::doubleClickBlock);
+        OpGraphicsBlock* block=createBlock(className, pos, iconPath);
+
+        //如果是嵌套算子
+        if(false){
+            createSubScene(block);
+        }
 
         log_info("添加算子：{0}", opName.toStdString());
     }
     ++_nums;
+}
+
+OpGraphicsBlock *OperatorScene::createBlock(const QString &className, const QPointF &pos, const QString &iconPath)
+{
+    QString opName=className+QString::number(_nums);
+    OpGraphicsBlock *block=_blockCtrl->addBlock(opName, className, iconPath);
+
+    addItem(block);
+    block->setPos(pos);
+
+    connect(block, &OpGraphicsBlock::tryChangeOpName, this, &OperatorScene::changeOpName);
+    connect(block, &OpGraphicsBlock::deleted, this, &OperatorScene::deleteBlock);
+    connect(block, &OpGraphicsBlock::moved, this, &OperatorScene::moveBlock);
+    connect(block, &OpGraphicsBlock::clicked, this, &OperatorScene::clickBlock);
+    connect(block, &OpGraphicsBlock::doubleClicked, this, &OperatorScene::doubleClickBlock);
+
+    return block;
+}
+
+void OperatorScene::createSubScene(OpGraphicsBlock *block)
+{
+    QString sceneName=block->opName();
+    OperatorScene* scene=new OperatorScene(sceneName, this);
+    _childrens.insert(sceneName, scene);
+}
+
+void OperatorScene::createPath(const Dependency &depend)
+{
+    LinePath* linePath=_lineCtrl.add(depend);
+    if(linePath){
+        connect(linePath, &LinePath::deleted, this, &OperatorScene::deletePath);
+        addItem(linePath);
+    }
 }
 
 void OperatorScene::setParentScene(OperatorScene *parent){
@@ -128,19 +159,31 @@ void OperatorScene::clickBlock(const QString &opName)
 {
 }
 
+void OperatorScene::deletePath(const Dependency &depend)
+{
+    LinePath* line=_lineCtrl.deleted(depend);
+    removeItem(line);
+    delete line;
+}
+
 void OperatorScene::doubleClickBlock(const QString &opName)
 {
+    if(_childrens.contains(opName))
+        emit showScene(_childrens.value(opName));
 }
 
 void OperatorScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *contextMenuEvent)
 {
     if(_parent){
         QMenu menu;
+        menu.addAction(_sceneName)->setDisabled(true);
         QAction* act=menu.addAction("上一层");
         if(act==menu.exec(contextMenuEvent->screenPos())){
             emit showScene(_parent);
         }
     }
+
+    QGraphicsScene::contextMenuEvent(contextMenuEvent);
 }
 
 void OperatorScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
@@ -161,10 +204,11 @@ void OperatorScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
         //合法性判断
         QPen pen=_tempLine->pen();
-        pen.setColor(LINEPATH_INVALID_COLOR);
+        pen.setColor(LINEPATH_ACTIVE_COLOR);
         if(!_lineCtrl.isValid(Dependency(_startDot->block(),block)))
-            _tempLine->setPen(pen);
+            pen.setColor(LINEPATH_INVALID_COLOR);
 
+        _tempLine->setPen(pen);
         addItem(_tempLine);
     }
 
@@ -191,10 +235,7 @@ void OperatorScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
         OpGraphicsBlock* block=getBlockByPos(scenePos);
         if(block){
-            Dependency depend(_startDot->block(), block);
-            LinePath* linePath=_lineCtrl.add(depend);
-            if(linePath)
-                addItem(linePath);
+            createPath(Dependency(_startDot->block(), block));
         }
 
         _isLine=false;

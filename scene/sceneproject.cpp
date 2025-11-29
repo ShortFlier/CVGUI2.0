@@ -29,7 +29,7 @@ OperatorScene *SceneProject::addProjects(const QString &name)
         str=str.arg(pname);
         tip_warn(str);
     }else{
-        scene=new OperatorScene;
+        scene=new OperatorScene(pname);
         _subProjects.insert(pname, scene);
         log_info("新建子工程：{0}", pname.toStdString());
     }
@@ -37,6 +37,10 @@ OperatorScene *SceneProject::addProjects(const QString &name)
     ++_nums;
 
     return scene;
+}
+
+QMap<QString, OperatorScene *>& SceneProject::subProjects(){
+    return _subProjects;
 }
 
 void SceneProject::clear()

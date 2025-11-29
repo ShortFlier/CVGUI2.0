@@ -22,7 +22,6 @@ public:
 protected:
 
 private:
-    QString _iconPath;
 
     QList<OpGraphicsDot*> _dots;
 };

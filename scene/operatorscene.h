@@ -22,13 +22,18 @@ class OperatorScene : public QGraphicsScene
 {
     Q_OBJECT
 public:
-    explicit OperatorScene(OperatorScene* parent=nullptr);
+    explicit OperatorScene(const QString& sceneName, OperatorScene* parent=nullptr);
     ~OperatorScene();
 
     //绘制可视矩形，以便在副视图显示
     void viewRect(QRectF rect);
 
-    void createItem(const QString& className, QPointF pos, const QString& iconPath);
+    void createItem(const QString& className, const QPointF& pos, const QString& iconPath);
+
+    //创建图形项，图形项子场景，线条
+    OpGraphicsBlock* createBlock(const QString& className, const QPointF& pos, const QString& iconPath);
+    void createSubScene(OpGraphicsBlock* block);
+    void createPath(const Dependency& depend);
 
     void setParentScene(OperatorScene* parent);
 
@@ -46,6 +51,9 @@ public slots:
     void deleteBlock(const QString& opName);
     void moveBlock(const QPointF& newScenePos);
     void clickBlock(const QString& opName);
+
+    void deletePath(const Dependency& depend);
+
     //如果点击的是嵌套算子，显示
     void doubleClickBlock(const QString& opName);
 
@@ -60,6 +68,8 @@ protected:
 
 private:
     QGraphicsRectItem* _viewRect;
+
+    QString _sceneName;
 
     int _nums=0;
 
