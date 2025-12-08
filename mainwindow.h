@@ -16,12 +16,14 @@ class MainWindow : public QMainWindow
 public:
     ~MainWindow();
 
+
     static MainWindow& instance();
     static MainWindow* instancePtr();
 
 private:
     MainWindow(QWidget *parent = nullptr);
 
+    void init();
 
     Ui::MainWindow *ui;
 };

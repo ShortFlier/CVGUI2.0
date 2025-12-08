@@ -13,14 +13,6 @@ OperatorSelector::OperatorSelector(QWidget *parent)
 
 void OperatorSelector::listOperator(const QList<OperatorInfo>& oinfos)
 {
-    //移除原有的
-    setCurrentIndex(-1);
-    for(int i=0; i<count(); i++){
-        QWidget* w=widget(i);
-        removeItem(i);
-        w->deleteLater();
-    }
-
     //分类
     QMap<QString, QList<OperatorInfo>> map;
     for(int i=0; i<oinfos.size(); ++i){
@@ -48,6 +40,18 @@ void OperatorSelector::listOperator(const QList<OperatorInfo>& oinfos)
         }
         addItem(new OperatorTable(items, this), itr.key());
     }
+}
+
+void OperatorSelector::init()
+{
+    //移除原有的
+    setCurrentIndex(-1);
+    for(int i=0; i<count(); i++){
+        QWidget* w=widget(i);
+        removeItem(i);
+        w->deleteLater();
+    }
+
 }
 
 

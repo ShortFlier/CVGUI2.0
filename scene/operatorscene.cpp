@@ -130,9 +130,11 @@ QMap<QString, OperatorScene *> &OperatorScene::childrenScenes(){
 
 void OperatorScene::changeOpName(const QString &oldName, const QString &newName)
 {
-    if(_blockCtrl->renameBlock(oldName, newName)){
+    QString _newName=newName;
+    _newName.remove('.');
+    if(_blockCtrl->renameBlock(oldName, _newName)){
         OpGraphicsBlock* block=static_cast<OpGraphicsBlock*>(sender());
-        block->setOpName(newName);
+        block->setOpName(_newName);
 
         log_info("{0}重命名：{1}", oldName.toStdString(), newName.toStdString());
     }else{

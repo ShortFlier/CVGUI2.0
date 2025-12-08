@@ -28,6 +28,8 @@ public:
     explicit OperatorSelector(QWidget *parent = nullptr);
 
     void listOperator(const QList<OperatorInfo>& oinfos);
+
+    void init();
 };
 
 

@@ -47,9 +47,11 @@ public:
     QMap<QString, OperatorScene*>& childrenScenes();
 
 public slots:
+    //不能有'.'
     void changeOpName(const QString& oldName, const QString& newName);
     void deleteBlock(const QString& opName);
     void moveBlock(const QPointF& newScenePos);
+
     void clickBlock(const QString& opName);
 
     void deletePath(const Dependency& depend);
@@ -62,9 +64,9 @@ protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *contextMenuEvent) override;
 
     //连线
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)override;
-    void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)override;
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
 
 private:
     QGraphicsRectItem* _viewRect;

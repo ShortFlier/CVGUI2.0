@@ -29,7 +29,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>337</width>
+          <width>257</width>
           <height>428</height>
          </rect>
         </property>
@@ -43,7 +43,11 @@
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
-       <widget class="QWidget" name="opResult" native="true"/>
+       <widget class="ResultView" name="opResult">
+        <property name="currentIndex">
+         <number>-1</number>
+        </property>
+       </widget>
        <widget class="QWidget" name="opSet" native="true"/>
       </widget>
      </widget>
@@ -84,6 +88,12 @@
    <class>OperatorView</class>
    <extends>QWidget</extends>
    <header location="global">operatorview.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ResultView</class>
+   <extends>QTabWidget</extends>
+   <header location="global">resultview.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
