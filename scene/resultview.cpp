@@ -14,3 +14,13 @@ ResultView::ResultView(QWidget *parent)
     addTab(_dataView, "结果");
 }
 
+ImageDisplayer *ResultView::imgView()
+{
+    return _imgView;
+}
+
+DataView *ResultView::dataView()
+{
+    return _dataView;
+}
+

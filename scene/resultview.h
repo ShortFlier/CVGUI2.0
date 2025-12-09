@@ -17,6 +17,9 @@ class ResultView : public QTabWidget
 public:
     explicit ResultView(QWidget *parent = nullptr);
 
+    ImageDisplayer* imgView();
+    DataView* dataView();
+
 private:
     ImageDisplayer* _imgView=nullptr;
     DataView* _dataView=nullptr;

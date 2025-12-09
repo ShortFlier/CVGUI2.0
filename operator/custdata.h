@@ -9,7 +9,12 @@
 class CustDataBase{
 public:
     virtual ~CustDataBase(){}
+
     virtual int type()=0;
+
+    virtual void setData(void* data)=0;
+
+    virtual void* vdata()=0;
 };
 
 
@@ -17,8 +22,19 @@ public:
 template<int _type, typename Type>
 class CustData{
 public:
+    CustData():_data(){}
+    CustData(const Type&& data):_data(std::forward(data)){}
+
     int type(){
         return _type;
+    }
+
+    void setData(void* data){
+        _data=*static_cast<Type*>(data);
+    }
+
+    void* vdata(){
+        return static_cast<void*>(&data);
     }
 
     Type data(){

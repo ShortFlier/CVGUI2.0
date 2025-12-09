@@ -14,6 +14,9 @@ class DataView : public QScrollArea
 public:
     explicit DataView(QWidget *parent = nullptr);
 
+private:
+    QWidget* _content;
+
 signals:
 };
 
